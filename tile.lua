@@ -7,6 +7,7 @@ grass = love.graphics.newQuad(100,0,100,100, tilemap:getDimensions())
 dirt = love.graphics.newQuad(200,0,100,200, tilemap:getDimensions())
 
 
+
 Tile = class(function(t)
 			t.isCollidedWith = false
 		end)

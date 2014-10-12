@@ -41,9 +41,13 @@ function love.load()
 		end
 	end
 	
-	player = GameObject(150,150,32,32,5,PlayerInputComponent())
+	player = createPlayer(150,150)
 
 	
+end
+
+function createPlayer(x, y)
+	return GameObject(x, y, 32, 32, 5, PlayerInputComponent)
 end
 
 

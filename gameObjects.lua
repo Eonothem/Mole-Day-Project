@@ -58,14 +58,18 @@ GameObjectPhysicsComponent = class(PhysicsComponent)
 function GameObjectPhysicsComponent:update(object, speed, map)
 	if object.velocityY ~= 0 then
         object.y = object.y+(speed*object.velocityY)
-        handleVerticalCollision(player, map)
+        handleVerticalCollision(object, map)
     end
 
 	if object.velocityX ~= 0 then
         object.x = object.x+(speed*object.velocityX)
-        handleHorizontalCollision(player, map)
+        handleHorizontalCollision(object, map)
     end
 end
+
+-----------------------
+--COLLISION DETECTION--
+-----------------------
 
 function handleHorizontalCollision(object, map)
 	local leftTile = toGrid(object.x)
@@ -77,7 +81,7 @@ function handleHorizontalCollision(object, map)
 	for y = topTile, botTile do
 		for x = leftTile, rightTile do
 			if map[y][x].collide then
-				player.x = player.x + getHorizontalIntersectionDepth(player, map[y][x])
+				object.x = object.x + getHorizontalIntersectionDepth(object, map[y][x])
 			end
 		end
 	end
@@ -93,7 +97,7 @@ function handleVerticalCollision(object, map)
 	for y = topTile, botTile do
 		for x = leftTile, rightTile do
 			if map[y][x].collide then
-				player.y = player.y + getVerticalIntersectionDepth(player, map[y][x])
+				object.y = object.y + getVerticalIntersectionDepth(object, map[y][x])
 			end
 		end
 	end

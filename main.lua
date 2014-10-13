@@ -42,6 +42,7 @@ function love.load()
 	end
 	
 	player = createPlayer(150,150)
+	block = GameObject(60, 200, 128, 32, 0, NullInputComponent)
 
 	
 end
@@ -91,6 +92,8 @@ function love.draw()
 
 	love.graphics.setColor(0,0,225,255)
 	love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
+	love.graphics.setColor(255,0,0,255)
+	love.graphics.rectangle("fill", block.x, block.y, block.width, block.height)
 
 	love.graphics.setColor(0,0,0,255)
 

@@ -52,6 +52,11 @@ function PlayerInputComponent:update(object)
 	
 end
 
+NullInputComponent = class(InputComponent)
+
+function NullInputComponent:update()
+end
+
 PhysicsComponent = class()
 GameObjectPhysicsComponent = class(PhysicsComponent)
 

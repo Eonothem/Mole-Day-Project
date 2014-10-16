@@ -18,6 +18,12 @@ GameObject = class(RectangleShape, function(p, x, y, width, height, speed, input
 
 			   end)
 
+Enemy = class(GameObject, function(p,x,y,width,height,speed,input,physics)
+			  GameObject.init(p,x,y,width,height,speed,input,physics)
+
+			  
+			  end)
+
 
 Collectible = class(RectangleShape, function(c, x, y, width, height, info)
 			   RectangleShape.init(c, x, y, width, height)

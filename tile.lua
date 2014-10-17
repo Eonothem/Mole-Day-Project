@@ -1,11 +1,18 @@
 require("class")
+TILE_WIDTH = 32
+TILE_REAL_WIDTH = 34
 
-tilemap = love.graphics.newImage("tilemap.png")
+tilemap = love.graphics.newImage("tilemap34.png")
 
-stone = love.graphics.newQuad(0,0,100,100, tilemap:getDimensions())
-grass = love.graphics.newQuad(100,0,100,100, tilemap:getDimensions())
-dirt = love.graphics.newQuad(200,0,100,200, tilemap:getDimensions())
 
+function colToX(col)
+	return (col*TILE_REAL_WIDTH)+1
+end
+
+
+stone = love.graphics.newQuad(colToX(0),0,TILE_WIDTH, TILE_WIDTH, tilemap:getDimensions())
+grass = love.graphics.newQuad(colToX(1),0,TILE_WIDTH, TILE_WIDTH, tilemap:getDimensions())
+dirt = love.graphics.newQuad(colToX(2),0,TILE_WIDTH,TILE_WIDTH, tilemap:getDimensions())
 
 
 Tile = class(function(t)

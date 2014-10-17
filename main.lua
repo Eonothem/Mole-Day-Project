@@ -2,9 +2,10 @@ require("tile")
 require("class")
 require("gameObjects")
 require("camera")
+require("audio")
 
-SCALE_FACTOR = .5
-TILE_WIDTH = 100*SCALE_FACTOR
+SCALE_FACTOR = 1
+TILE_WIDTH = 32*SCALE_FACTOR
 
 
 
@@ -14,7 +15,7 @@ int_map = {{1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 },
 	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
 	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
 	       {1 ,0 ,0 ,0 ,0 ,0 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,1 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
+	       {1 ,0 ,0 ,0 ,0 ,0 ,1 ,2 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
 	       {1 ,0 ,0 ,0 ,0 ,0 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
 	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
 	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
@@ -34,6 +35,7 @@ WORLD_OBJECTS = {}
 FONT_SIZE =25
 
 function love.load()
+	theme:play()
 	love.window.setMode(SCREEN_WIDTH,SCREEN_HEIGHT)
 
 	love.graphics.setNewFont("novem.ttf", FONT_SIZE)
@@ -72,24 +74,25 @@ function love.load()
 end
 
 function createMoleFact(x, y, info)
-	return Collectible(x, y, 32, 32, info)
+	return Collectible(x, y, 16, 16, info)
 end
  
 function createPlayer(x, y)
-	return GameObject(x, y, 32, 32, 5, PlayerInputComponent)
+	return GameObject(x, y, 16, 16, 4, PlayerInputComponent)
 end
 
 function love.update(dt)
-
 	------------------
 	--Update Objects--
 	------------------
 
 	numObjects = table.getn(WORLD_OBJECTS)
+	player:castRay(45)
 
 	for i = 1, numObjects do
 		local object = WORLD_OBJECTS[i]
 		object:update(dt, map, WORLD_OBJECTS)
+
 
 		if object.isDead then
 			table.remove(WORLD_OBJECTS, i)
@@ -98,11 +101,17 @@ function love.update(dt)
 	
 end
 
+----------
+
 function love.keypressed(key, isrepeat)
 	if key == " " then
 		dialogHandler:nextMessage()
+		blip:play()
 	end
 end
+
+----------
+
 
 TextBox = class(function(t)
 		  t.textQueue = {}
@@ -126,31 +135,31 @@ end
 
 playerCamera = Camera(0,0,1,1,0)
 guiCamera = Camera(0,0,1,1,0)
+SCALE = .5
+
+
 
 function love.draw()
 	playerCamera:set()
-	playerCamera:setPosition((player.x-SCREEN_WIDTH/2)+(player.width/2), (player.y-SCREEN_HEIGHT/2)+(player.height/2))
-	playerCamera:setScale()
+	playerCamera:setScale(SCALE,SCALE)
 	--
 
-	love.graphics.setColor(225,225,225,255)
+
+
+	--
 
 	for row = 1, table.getn(map) do
 		for col = 1, table.getn(map[row]) do
-
-			--Check if collided with
-			if map[row][col].isCollidedWith and map[row][col].collide then
-				love.graphics.setColor(225,0,0,255)
-			elseif map[row][col].isCollidedWith then
-				love.graphics.setColor(0,255,0,255)
-			else
-				love.graphics.setColor(225,225,225,255)
-			end
-
-			love.graphics.draw(tilemap, map[row][col].image, map[row][col].col*TILE_WIDTH-TILE_WIDTH, map[row][col].row*TILE_WIDTH-TILE_WIDTH, 0, SCALE_FACTOR, SCALE_FACTOR)
-			
+			love.graphics.draw(tilemap, map[row][col].image, map[row][col].col*TILE_WIDTH-TILE_WIDTH, map[row][col].row*TILE_WIDTH-TILE_WIDTH, 0)
 		end
 	end
+
+	--
+
+	love.graphics.setColor(225,225,225,255)
+	love.graphics.line(player.x,player.y, player.aX, player.aY)
+		print(player.aY)
+
 
 	love.graphics.setColor(0,255,0,255)
 

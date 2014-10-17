@@ -1,3 +1,5 @@
+require("audio")
+
 RectangleShape = class(function(r, x, y, width, height)
 			r.x = x
 			r.y = y
@@ -12,6 +14,9 @@ GameObject = class(RectangleShape, function(p, x, y, width, height, speed, input
 			   p.speed = speed
 			   p.velocityX = 0
 			   p.velocityY = 0
+
+			   p.aX = 0
+			   p.aY = 0
 
 			   p.input = input
 			   p.physics = PlayerPhysicsComponent()
@@ -32,9 +37,15 @@ Collectible = class(RectangleShape, function(c, x, y, width, height, info)
 
 			   end)
 
+
 function GameObject:update(dt, map, world)
 	self.input:update(self)
 	self.physics:update(self, self.speed, map, world)
+end
+
+function GameObject:castRay(angle)
+	
+
 end
 
 function GameObject:setDialogHandler(handler)
@@ -111,6 +122,7 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
     		-- Player -> Collectible
     		--TODO: Most likely put an observer pattern here and send it to the rendering in order to render the mole fact
     		if instanceOf(collidedObject, Collectible) then
+    			pickup:play()
     			object.dialog:addText(collidedObject.info)
     			collidedObject.isDead = true
     		end
@@ -131,6 +143,7 @@ function instanceOf (subject, super)
 		mt = getmetatable(mt)
 	end	
 end
+
 
 
 
@@ -201,7 +214,7 @@ function handleVerticalCollision(object, map)
 	end
 end
 
-TOLERANCE = 4
+TOLERANCE = 2
 function getVerticalIntersectionDepth(rectA, rectB)
 
 	local rectAHalfHeight = rectA.height/2

@@ -10,23 +10,25 @@ RectangleShape = class(function(r, x, y, width, height)
 
 GameObject = class(RectangleShape, function(p, x, y, width, height, speed, input, physics)
 			   RectangleShape.init(p, x, y, width, height)
-			  
+			   
+			   p.angle = 0
 			   p.speed = speed
 			   p.velocityX = 0
 			   p.velocityY = 0
 
-			   p.aX = 0
-			   p.aY = 0
-
 			   p.input = input
-			   p.physics = PlayerPhysicsComponent()
+			   p.physics = physics
 
 			   end)
 
-Enemy = class(GameObject, function(p,x,y,width,height,speed,input,physics)
-			  GameObject.init(p,x,y,width,height,speed,input,physics)
+Enemy = class(GameObject, function(e,x,y,width,height,speed,input,physics,viewRange)
+			  GameObject.init(e,x,y,width,height,speed,input,physics)
 
-			  
+			  e.viewRange = viewRange
+			  e.viewTiles = {}
+			  e.walkingLeft = false
+			  e.walkingDown = false
+			  e.spottedPlayer = false
 			  end)
 
 
@@ -37,32 +39,106 @@ Collectible = class(RectangleShape, function(c, x, y, width, height, info)
 
 			   end)
 
+InputComponent = class(function(i, speed)
+						i.speed = speed
+						end)
+
+PhysicsComponent = class()
+
+
+----------------------------------
+----------------------------------
+----------------------------------
+
+function Enemy:update(dt, map, world)
+	self.input:update(self)
+	self.physics:update(self,map)
+	self:getVision(map)
+
+end
+
+function Enemy:getVision(map)
+	self.viewTiles = {}
+	if self.angle == 0 then
+		
+		for i = 1, self.viewRange do
+			if map[toGrid(self.y)][toGrid(self.x)+i].collide then break end
+			table.insert(self.viewTiles, map[toGrid(self.y)][toGrid(self.x)+i])
+		end
+
+	elseif self.angle == 180 then
+
+		for i = 1, self.viewRange do
+			if map[toGrid(self.y)][toGrid(self.x)-i].collide then break end
+			table.insert(self.viewTiles, map[toGrid(self.y)][toGrid(self.x)-i])
+		end
+
+	end
+end
+
+function Enemy:setAngle(angle)
+	self.angle = angle
+end
+
+EnemyPhysicsComponent = class(PhysicsComponent)
+
+function EnemyPhysicsComponent:update(object, map)
+	local centerX = object.x + (object.width/2)
+	local centerY = object.y + (object.height/2)
+
+	object.y = object.y + (object.speed*object.velocityY)
+	object.x = object.x + (object.speed*object.velocityX)
+
+	if not object.walkingLeft and map[toGrid(centerY)][toGrid(centerX)+1].collide then
+		object.walkingLeft = true
+		--bject:setAngle(180)
+	elseif object.walkingLeft and map[toGrid(centerY)][toGrid(centerX)-1].collide then
+		object.walkingLeft = false
+		--object:setAngle(0)
+	end
+		
+end
+
+PatrolLeftRight = class(InputComponent)
+
+function PatrolLeftRight:update(object)
+	if not object.spottedPlayer then	
+		if not object.walkingLeft then
+			object.velocityX = 1
+		else
+			object.velocityX = -1
+		end
+	else
+		object.velocityX = 0
+	end
+end
+
+PatrolUpDown = class(InputComponent)
+
+function PatrolUpDown:update(object)
+	if not object.spottedPlayer then	
+		if not object.walkingDown then
+			object.velocityY = -1
+		else
+			object.velocityY = 1
+		end
+	else
+		object.velocityY = 0
+	end
+end
+
+----------------------------------
+----------------------------------
+----------------------------------
 
 function GameObject:update(dt, map, world)
 	self.input:update(self)
 	self.physics:update(self, self.speed, map, world)
 end
 
-function GameObject:castRay(angle)
-	
-
-end
-
 function GameObject:setDialogHandler(handler)
 	self.dialog = handler
 end
-
-function Collectible:update()
-
-end
-
---------------
---COMPONENTS--
---------------
-
-InputComponent = class(function(i, speed)
-						i.speed = speed
-						end)
 
 PlayerInputComponent = class(InputComponent)
 
@@ -85,15 +161,10 @@ function PlayerInputComponent:update(object)
 	
 end
 
-NullInputComponent = class(InputComponent)
-
-function NullInputComponent:update()
-end
-
-PhysicsComponent = class()
 PlayerPhysicsComponent = class(PhysicsComponent)
 
 function PlayerPhysicsComponent:update(object, speed, map, world)
+	object.currentTile = map[toGrid(object.y+(object.height/2))][toGrid(object.x+(object.width/2))]
 
 	----------------------
 	--Physical Collision--
@@ -115,12 +186,24 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
     -----------------------------
 
     for i=1, table.getn(world) do
+    	local compareObject = world[i]
+
+    	if instanceOf(compareObject, Enemy) then
+    		--SPOTTED by Patrol
+    		for j=1, table.getn(compareObject.viewTiles) do
+    			if compareObject.viewTiles[j] == object.currentTile then
+    				alert:play()
+    				compareObject.spottedPlayer = true
+    				object.isSpotted = true
+    			end
+    		end
+    	end
+
     	--Check if it collides, and skip it if it collides with itself
     	if checkRectCollision(object, world[i]) and world[i] ~= object then
-    		local collidedObject = world[i]
+    		local collidedObject = compareObject
 
     		-- Player -> Collectible
-    		--TODO: Most likely put an observer pattern here and send it to the rendering in order to render the mole fact
     		if instanceOf(collidedObject, Collectible) then
     			pickup:play()
     			object.dialog:addText(collidedObject.info)
@@ -128,20 +211,17 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
     		end
 
     	end
+
     end
 
 end
 
-function instanceOf (subject, super)
-	super = tostring(super)
-	local mt = getmetatable(subject)
- 
-	while true do
-		if mt == nil then return false end
-		if tostring(mt) == super then return true end
- 
-		mt = getmetatable(mt)
-	end	
+----------------------------------
+----------------------------------
+----------------------------------
+
+function Collectible:update()
+
 end
 
 
@@ -257,4 +337,16 @@ function getHorizontalIntersectionDepth(rectA, rectB)
 		return -minDistanceX - distanceX - TOLERANCE
 	end
 
+end
+
+function instanceOf (subject, super)
+	super = tostring(super)
+	local mt = getmetatable(subject)
+ 
+	while true do
+		if mt == nil then return false end
+		if tostring(mt) == super then return true end
+ 
+		mt = getmetatable(mt)
+	end	
 end

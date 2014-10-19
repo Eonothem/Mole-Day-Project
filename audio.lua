@@ -6,3 +6,5 @@ pickup:setVolume(.3)
 
 blip = love.audio.newSource("blip.wav", "static")
 blip:setVolume(.5)
+
+alert = love.audio.newSource("alert.wav", "static")

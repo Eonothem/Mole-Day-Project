@@ -110,15 +110,13 @@ function love.update(dt)
 
 	numObjects = table.getn(WORLD_OBJECTS)
 
-	if not player.isSpotted then
-		for i = 1, numObjects do
-			local object = WORLD_OBJECTS[i]
-			object:update(dt, map, WORLD_OBJECTS)
+	for i = 1, numObjects do
+		local object = WORLD_OBJECTS[i]
+		object:update(dt, map, WORLD_OBJECTS)
 
 
-			if object.isDead then
-				table.remove(WORLD_OBJECTS, i)
-			end
+		if object.isDead then
+			table.remove(WORLD_OBJECTS, i)
 		end
 	end
 	

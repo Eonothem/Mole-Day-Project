@@ -91,10 +91,10 @@ function EnemyPhysicsComponent:update(object, map)
 
 	if not object.walkingLeft and map[toGrid(centerY)][toGrid(centerX)+1].collide then
 		object.walkingLeft = true
-		--bject:setAngle(180)
+		object:setAngle(180)
 	elseif object.walkingLeft and map[toGrid(centerY)][toGrid(centerX)-1].collide then
 		object.walkingLeft = false
-		--object:setAngle(0)
+		object:setAngle(0)
 	end
 		
 end
@@ -160,8 +160,28 @@ function PlayerInputComponent:update(object)
 
 	
 end
-
+stime = 0
 PlayerPhysicsComponent = class(PhysicsComponent)
+
+Timer = class(function(t)
+			t.startTime = -1
+			end)
+
+function Timer:start()
+	self.startTime = love.timer.getTime()
+end
+
+function Timer:getElpasedTime()
+	if self.startTime ~= -1 then
+		return love.timer.getTime()-self.startTime
+	else
+		return 0
+	end
+end
+
+function Timer:clear()
+	self.startTime = -1
+end
 
 function PlayerPhysicsComponent:update(object, speed, map, world)
 	object.currentTile = map[toGrid(object.y+(object.height/2))][toGrid(object.x+(object.width/2))]
@@ -170,15 +190,17 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
 	--Physical Collision--
 	----------------------
 
-	if object.velocityY ~= 0 then
-        object.y = object.y+(speed*object.velocityY)
-        handleVerticalCollision(object, map)
+	if not object.isSpotted then
+		if object.velocityY ~= 0 then
+        	object.y = object.y+(speed*object.velocityY)
+        	handleVerticalCollision(object, map)
 
-    end
+   	 	end
 
-	if object.velocityX ~= 0 then
-        object.x = object.x+(speed*object.velocityX)
-        handleHorizontalCollision(object, map)
+		if object.velocityX ~= 0 then
+        	object.x = object.x+(speed*object.velocityX)
+        	handleHorizontalCollision(object, map)
+    	end
     end
 
     -----------------------------
@@ -192,7 +214,18 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
     		--SPOTTED by Patrol
     		for j=1, table.getn(compareObject.viewTiles) do
     			if compareObject.viewTiles[j] == object.currentTile then
-    				alert:play()
+    				if not object.isSpotted then
+    					alert:play()
+    					theme:pause()
+    					alertTimer = Timer()
+    					alertTimer:start()
+    				end
+
+    				--Wait
+    				if object.isSpotted and alertTimer:getElpasedTime() > .5 then
+    					gameOver:play()
+    					alertTimer:clear()
+    				end
     				compareObject.spottedPlayer = true
     				object.isSpotted = true
     			end

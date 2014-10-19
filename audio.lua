@@ -8,3 +8,5 @@ blip = love.audio.newSource("blip.wav", "static")
 blip:setVolume(.5)
 
 alert = love.audio.newSource("alert.wav", "static")
+
+gameOver = love.audio.newSource("gameOver.mp3", "static")

@@ -136,8 +136,8 @@ function GameObject:update(dt, map, world)
 	self.physics:update(self, self.speed, map, world)
 end
 
-function GameObject:setDialogHandler(handler)
-	self.dialog = handler
+function GameObject:setCodec(codec)
+	self.codec = codec
 end
 
 PlayerInputComponent = class(InputComponent)
@@ -239,7 +239,8 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
     		-- Player -> Collectible
     		if instanceOf(collidedObject, Collectible) then
     			pickup:play()
-    			object.dialog:addText(collidedObject.info)
+    			object.codec:setText(MOLE_CONVERSATION)
+    			codec.isRinging = true
     			collidedObject.isDead = true
     		end
 

@@ -24,6 +24,9 @@ int_map = {{1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 },
 
 MOLE_FACT = "A mole is a unit of measurment that is pretty swag."
 
+MOLE_CONVERSATION = {"Hello Solid Mole.", "I see you have collected a mole fact.", "A mole fact?", "Yes indeed a mole fact.", 
+"Mole facts are used to get a passing grade in Dr. Heff's class", "Alright, I'll keep that in mind.", "Everybody get up, it's time to slam now We got a real jam goin' down Welcome to the Space Jam Here's your chance, do your dance at the Space Jam, alright"}
+
 MAP_WIDTH = table.getn(int_map[1])*TILE_WIDTH
 MAP_HEIGHT = table.getn(int_map)*TILE_WIDTH
 
@@ -32,7 +35,7 @@ SCREEN_HEIGHT = 720
 
 WORLD_OBJECTS = {}
 
-FONT_SIZE =25
+FONT_SIZE =48
 
 ------------------
 --PRE GAME STUFF--
@@ -66,12 +69,14 @@ function love.load()
 	--------------------
 	--Init World Stuff--
 	--------------------
-
+	codec = Codec()
+	--codec:activate()
+	--codec:setText(MOLE_CONVERSATION)
 	dialogHandler = TextBox()
 
 	player = createPlayer(77,77)
 	player.isSpotted = false
-	player:setDialogHandler(dialogHandler)
+	player:setCodec(codec)
 
 	table.insert(WORLD_OBJECTS, createBadGuy(100,100))
 	table.insert(WORLD_OBJECTS, player)
@@ -96,27 +101,45 @@ end
 -------------
 
 function love.keypressed(key, isrepeat)
-	if key == " " and table.getn(dialogHandler.textQueue) > 0 then
-		dialogHandler:nextMessage()
+	if key == " " and codec.isRinging then
+		codecRing:stop()
+		codec.isRinging = false
+		codec:activate()
+	end
+
+	if key == " " and table.getn(codec.textToRead) > 0 and codec.active then
+		--dialogHandler:nextMessage()
+		codec:nextLine()
 		blip:play()
+
+		if table.getn(codec.textToRead) == 0 then
+			codec:deactivate()
+		end
 	end
 end
+
+codecRingImage = love.graphics.newImage("getCall.png")
 
 function love.update(dt)
 	------------------
 	--Update Objects--
 	------------------
 
+	if codec.isRinging then
+		codecRing:play()
+	end
 
-	numObjects = table.getn(WORLD_OBJECTS)
+	if not codec.active then
+		numObjects = table.getn(WORLD_OBJECTS)
 
-	for i = 1, numObjects do
-		local object = WORLD_OBJECTS[i]
-		object:update(dt, map, WORLD_OBJECTS)
+		for i = 1, numObjects do
+			local object = WORLD_OBJECTS[i]
+			object:update(dt, map, WORLD_OBJECTS)
 
 
-		if object.isDead then
-			table.remove(WORLD_OBJECTS, i)
+			if object.isDead then
+				table.remove(WORLD_OBJECTS, i)
+			end
 		end
 	end
 	
@@ -156,13 +179,26 @@ function love.draw()
 	end
 
 	playerCamera:unset()
-	handleTextBox()
+	--handleTextBox()
+	guiCamera:set()
+
+	if codec.active then
+		handleCodec()
+	end
+
+	love.graphics.setColor(255,255,255,255)
+
+	if codec.isRinging then
+		love.graphics.draw(codecRingImage, (SCREEN_WIDTH/2)-codecRingImage:getWidth()/2, (SCREEN_HEIGHT/6)-codecRingImage:getHeight()/2,0,.8,.8)
+	end
+
+	guiCamera:unset()
+
 end
 
 function handleTextBox()
 	love.graphics.setColor(255,255,255,255)
 
-	guiCamera:set()
 	if table.getn(dialogHandler.textQueue) > 0 then
 		local string = dialogHandler.textQueue[1]
 
@@ -171,6 +207,26 @@ function handleTextBox()
 		end
 		love.graphics.print(string, 0, SCREEN_HEIGHT-FONT_SIZE)
 	end
+end
+
+codecImage = love.graphics.newImage("codec.png")
+
+function handleCodec()
+	love.graphics.setColor(255,255,255,255)
+	guiCamera:set()
+
+	love.graphics.draw(codecImage, 0, 0)
+
+
+	if table.getn(codec.textToRead) > 0 then
+		local string = codec.textToRead[1]
+
+		if table.getn(codec.textToRead) > 1 then
+			string = string.."..."
+		end
+		love.graphics.printf(string, 170, 470, 1050,"center")
+	end
+
 	guiCamera:unset()
 end
 
@@ -193,4 +249,28 @@ end
 
 function toGrid(coord)
 	return math.ceil(coord/TILE_WIDTH)
+end
+
+Codec = class(function(c)
+		c.isRinging = false
+		c.active = false
+		c.textToRead = {}
+		c.text = nil
+		end)
+
+function Codec:activate()
+	self.active = true
+end
+
+
+function Codec:deactivate()
+	self.active = false
+end
+
+function Codec:nextLine()
+	table.remove(self.textToRead, 1)
+end
+
+function Codec:setText(text)
+	self.textToRead = text
 end

@@ -24,7 +24,7 @@ int_map = {{1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 },
 
 MOLE_FACT = "A mole is a unit of measurment that is pretty swag."
 
-MOLE_CONVERSATION = {"Hello Solid Mole.", "I see you have collected a mole fact.", "A mole fact?", "Yes indeed a mole fact.", 
+MOLE_CONVERSATION = {"Placeholder", "YES U SCRUBS", "Yes indeed a mole fact.", 
 "Mole facts are used to get a passing grade in Dr. Heff's class", "Alright, I'll keep that in mind.", "Everybody get up, it's time to slam now We got a real jam goin' down Welcome to the Space Jam Here's your chance, do your dance at the Space Jam, alright"}
 
 MAP_WIDTH = table.getn(int_map[1])*TILE_WIDTH
@@ -42,6 +42,7 @@ FONT_SIZE =48
 ------------------
 
 function love.load()
+	print(MOLE_CONVERSATION[1])
 	------------
 	--Set Font--
 	------------

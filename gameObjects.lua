@@ -51,7 +51,7 @@ PhysicsComponent = class()
 ----------------------------------
 
 function Enemy:update(dt, map, world)
-	self.input:update(self)
+	self.input:update(self,map)
 	self.physics:update(self,map)
 	self:getVision(map)
 
@@ -101,31 +101,131 @@ end
 
 PatrolLeftRight = class(InputComponent)
 
-function PatrolLeftRight:update(object)
+function PatrolLeftRight:update(object, map)
+	local centerX = object.x + (object.width/2)
+	local centerY = object.y + (object.height/2)
+
 	if not object.spottedPlayer then	
 		if not object.walkingLeft then
-			object.velocityX = 1
+			walkRight(object)
+
+			if map[toGrid(centerY)][toGrid(centerX)+1].collide then
+				object.walkingLeft = true
+			end
+
 		else
-			object.velocityX = -1
+			walkLeft(object)
+
+			if map[toGrid(centerY)][toGrid(centerX)-1].collide then
+				object.walkingLeft = false
+			end
 		end
 	else
-		object.velocityX = 0
+		standStill(object)
 	end
 end
+
+
+PatrolSquare = class(InputComponent)
+function PatrolSquare:update(object,map)
+	local centerX = object.x + (object.width/2)
+	local centerY = object.y + (object.height/2)
+
+	if not object.spottedPlayer then
+		if isStill(object) then
+			walkUp(object)
+		else
+			if walkingUp(object) and map[toGrid(centerY)-1][toGrid(centerX)].collide then
+				walkRight(object)
+			elseif walkingRight(object) and map[toGrid(centerY)][toGrid(centerX)+1].collide then
+				walkDown(object)
+			elseif walkingDown(object) and map[toGrid(centerY)+1][toGrid(centerX)].collide then
+				walkLeft(object)
+			elseif walkingLeft(object) and map[toGrid(centerY)][toGrid(centerX)-1].collide then
+				walkUp(object)
+			end
+		end
+	else
+		standStill(object)
+	end
+end
+
 
 PatrolUpDown = class(InputComponent)
 
+
 function PatrolUpDown:update(object)
-	if not object.spottedPlayer then	
+	local centerX = object.x + (object.width/2)
+	local centerY = object.y + (object.height/2)
+
+	if not object.spottedPlayer then
 		if not object.walkingDown then
-			object.velocityY = -1
-		else
-			object.velocityY = 1
+			walkUp(object)
+
+			if map[toGrid(centerY)-1][toGrid(centerX)].collide then
+				object.walkingDown = true
+			end
+		else 
+			walkDown(object)
+
+			if map[toGrid(centerY)+1][toGrid(centerX)].collide then
+				object.walkingDown = false
+			end
 		end
 	else
-		object.velocityY = 0
+		standStill(object)
 	end
 end
+
+function walkUp(object)
+	object.velocityY = -1
+	object.velocityX = 0
+	object:setAngle(90)
+end
+
+function walkDown(object)
+	object.velocityY = 1
+	object.velocityX = 0
+	object:setAngle(270)
+end
+
+function walkRight(object)
+	object.velocityY = 0
+	object.velocityX = 1
+	object:setAngle(0)
+end
+
+function walkLeft(object)
+	object.velocityY = 0
+	object.velocityX = -1
+	object:setAngle(180)
+end
+
+function standStill(object)
+	object.velocityY = 0
+	object.velocityX = 0
+end
+
+function walkingRight(object)
+	return object.velocityY == 0 and object.velocityX == 1
+end
+
+function walkingDown(object)
+	return object.velocityY == 1 and object.velocityX == 0
+end
+
+function walkingLeft(object)
+	return object.velocityY == 0 and object.velocityX == -1
+end
+
+function walkingUp(object)
+	return object.velocityY == -1 and object.velocityX == 0
+end
+
+function isStill(object)
+	return object.velocityY == 0 and object.velocityX == 0
+end
+
 
 ----------------------------------
 ----------------------------------

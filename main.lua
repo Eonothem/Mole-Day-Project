@@ -24,8 +24,9 @@ int_map = {{1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 },
 
 MOLE_FACT = "A mole is a unit of measurment that is pretty swag."
 
-MOLE_CONVERSATION = {"Placeholder", "YES U SCRUBS", "Yes indeed a mole fact.", 
-"Mole facts are used to get a passing grade in Dr. Heff's class", "Alright, I'll keep that in mind.", "Everybody get up, it's time to slam now We got a real jam goin' down Welcome to the Space Jam Here's your chance, do your dance at the Space Jam, alright"}
+MOLE_CONVERSATION = {"Solid Mole, can you read me?", "Loud and clear Colonel Avagrado.", "Okay. As you know, Liquid Mole has been gathering various chemistry facts in order to work on his new war machine.", "Yeah, Metal Gear MOL.",
+"Your mission is to infeltrate Liquid Mole's base and to retrive these chemistry facts so that Liquid Mole cannot finish his plans.", "Lethal or non-lethal?", "Non-lethal, we don't want any bodies laying around.", "Alright, so just retrive the mole facts and get out of there?",
+"Yes. Make sure you are not seen by any of the guards, or it's game over.","The gaurd's line of sight should be visible due to your implanted nanomachines.","If you need more information, contact me on your Moldec.","My frequency is 6.0221","Got it.", "Good luck."}
 
 MAP_WIDTH = table.getn(int_map[1])*TILE_WIDTH
 MAP_HEIGHT = table.getn(int_map)*TILE_WIDTH
@@ -42,7 +43,6 @@ FONT_SIZE =48
 ------------------
 
 function love.load()
-	print(MOLE_CONVERSATION[1])
 	------------
 	--Set Font--
 	------------
@@ -71,8 +71,6 @@ function love.load()
 	--Init World Stuff--
 	--------------------
 	codec = Codec()
-	--codec:activate()
-	--codec:setText(MOLE_CONVERSATION)
 	dialogHandler = TextBox()
 
 	player = createPlayer(77,77)
@@ -102,14 +100,8 @@ end
 -------------
 
 function love.keypressed(key, isrepeat)
-	if key == " " and codec.isRinging then
-		codecRing:stop()
-		codec.isRinging = false
-		codec:activate()
-	end
-
-	if key == " " and table.getn(codec.textToRead) > 0 and codec.active then
-		--dialogHandler:nextMessage()
+	
+	if key == " " and table.getn(codec.textToRead) > 0 and codec.active and not codec.isRinging then
 		codec:nextLine()
 		blip:play()
 
@@ -117,11 +109,18 @@ function love.keypressed(key, isrepeat)
 			codec:deactivate()
 		end
 	end
+
+	if key == " " and codec.isRinging then
+		codecRing:stop()
+		codec.isRinging = false
+		codec:activate()
+	end
+
 end
 
-codecRingImage = love.graphics.newImage("getCall.png")
-
+time = 0
 function love.update(dt)
+	time = time+dt
 	------------------
 	--Update Objects--
 	------------------
@@ -146,9 +145,13 @@ function love.update(dt)
 	
 end
 
+-----
+
 playerCamera = Camera(0,0,1,1,0)
 guiCamera = Camera(0,0,1,1,0)
 SCALE = .5
+
+codecRingImage = love.graphics.newImage("getCall.png")
 
 function love.draw()
 	playerCamera:set()
@@ -194,25 +197,22 @@ function love.draw()
 	end
 
 	guiCamera:unset()
-
+	
 end
 
-function handleTextBox()
-	love.graphics.setColor(255,255,255,255)
+love.graphics.setColor(11,38,33,255)
+love.graphics.setColor(102,163,150,255)
 
-	if table.getn(dialogHandler.textQueue) > 0 then
-		local string = dialogHandler.textQueue[1]
 
-		if table.getn(dialogHandler.textQueue) > 1 then
-			string = string.."..."
-		end
-		love.graphics.print(string, 0, SCREEN_HEIGHT-FONT_SIZE)
-	end
-end
 
-codecImage = love.graphics.newImage("codec.png")
+codecImage = love.graphics.newImage("moledec2.png")
 
 function handleCodec()
+	love.graphics.setColor(11,38,33,255)
+	love.graphics.rectangle("fill",200,0,1000,500)
+	love.graphics.setColor(102,163,150,255)
+
+	love.graphics.rectangle("fill",200,(70*math.sin(3*time)+180),1000,500)
 	love.graphics.setColor(255,255,255,255)
 	guiCamera:set()
 
@@ -223,7 +223,7 @@ function handleCodec()
 		local string = codec.textToRead[1]
 
 		if table.getn(codec.textToRead) > 1 then
-			string = string.."..."
+			string = string
 		end
 		love.graphics.printf(string, 170, 470, 1050,"center")
 	end

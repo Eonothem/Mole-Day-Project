@@ -60,7 +60,7 @@ end
 function Enemy:getVision(map)
 
 	self.viewTiles = {}
-	if self.angle == 0 then
+	if self.angle == 180 then
 		
 		for j = -1, 1 do
 			for i = 1, self.viewRange do
@@ -72,7 +72,7 @@ function Enemy:getVision(map)
 			end
 		end
 
-	elseif self.angle == 180 then
+	elseif self.angle == 0 then
 
 	for j = -1, 1 do
 		for i = 1, self.viewRange do
@@ -125,13 +125,6 @@ function EnemyPhysicsComponent:update(object, map)
 	object.y = object.y + (object.speed*object.velocityY)
 	object.x = object.x + (object.speed*object.velocityX)
 
-	if not object.walkingLeft and map[toGrid(centerY)][toGrid(centerX)+1].collide then
-		object.walkingLeft = true
-		object:setAngle(180)
-	elseif object.walkingLeft and map[toGrid(centerY)][toGrid(centerX)-1].collide then
-		object.walkingLeft = false
-		object:setAngle(0)
-	end
 		
 end
 
@@ -147,6 +140,8 @@ function PatrolLeftRight:update(object, map)
 
 			if map[toGrid(centerY)][toGrid(centerX)+1].collide then
 				object.walkingLeft = true
+				object:setAngle(0)
+
 			end
 
 		else
@@ -154,6 +149,8 @@ function PatrolLeftRight:update(object, map)
 
 			if map[toGrid(centerY)][toGrid(centerX)-1].collide then
 				object.walkingLeft = false
+					object:setAngle(180)
+
 			end
 		end
 	else
@@ -200,12 +197,14 @@ function PatrolUpDown:update(object)
 
 			if map[toGrid(centerY)-1][toGrid(centerX)].collide then
 				object.walkingDown = true
+				object:setAngle(270)
 			end
 		else 
 			walkDown(object)
 
 			if map[toGrid(centerY)+1][toGrid(centerX)].collide then
 				object.walkingDown = false
+				object:setAngle(90)
 			end
 		end
 	else
@@ -228,13 +227,13 @@ end
 function walkRight(object)
 	object.velocityY = 0
 	object.velocityX = 1
-	object:setAngle(0)
+	object:setAngle(180)
 end
 
 function walkLeft(object)
 	object.velocityY = 0
 	object.velocityX = -1
-	object:setAngle(180)
+	object:setAngle(0)
 end
 
 function standStill(object)
@@ -361,6 +360,7 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
     					CURRENT_SONG:stop()
     					gameOver:play()
     					alertTimer:clear()
+    					GAME_OVER = true
     				end
     				compareObject.spottedPlayer = true
     				object.isSpotted = true

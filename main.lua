@@ -65,7 +65,7 @@ int_map = {{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 
 MOLE_FACT = "A mole is a unit of measurment that is pretty swag."
 
-MOLE_CONVERSATION = {"Solid Mole, can you read me?", "Loud and clear Colonel Avagrado.", "As you know, Liquid Mole has been gathering various chemistry facts in order to work on his new war machine.", "Yeah, Metal Gear MOL.",
+INTRO_CODEC = {"Solid Mole, can you read me?", "Loud and clear Colonel Avagrado.", "As you know, Liquid Mole has been gathering various chemistry facts in order to work on his new war machine.", "Yeah, Metal Gear MOL.",
 "Your mission is to infeltrate Liquid Mole's base and to retrive these chemistry facts so that Liquid Mole cannot finish his plans.", "Lethal or non-lethal?", "Non-lethal, we don't want any bodies laying around.", "Alright, so just retrive the mole facts and get out of there?",
 "Yes. Make sure you are not seen by any of the guards, or it's game over.","The gaurd's line of sight should be visible due to your implanted nanomachines.","If you need more information, contact me on your Moldec.","My frequency is 6.0221","Got it.", "Good luck."}
 
@@ -79,13 +79,15 @@ WORLD_OBJECTS = {}
 
 FONT_SIZE =48
 
-PLAY_INTRO = false
+PLAY_INTRO = true
 PLAY_INTRO_CODEC = false
+GAME_OVER = false
 
 ------------------
 --PRE GAME STUFF--
 ------------------
 
+	
 function love.load()
 	if PLAY_INTRO then
 		CURRENT_SONG = discovery
@@ -121,22 +123,13 @@ function love.load()
 	--Init World Stuff--
 	--------------------
 	codec = Codec()
-	dialogHandler = TextBox()
+	
+	resetGame()
 
-	player = createPlayer(1030,1480)
-	player.isSpotted = false
-	player:setCodec(codec)
+		
+	print(codec.textToRead[1])
 
 	
-
-	table.insert(WORLD_OBJECTS, createBadGuy(280,1490,PatrolLeftRight))
-	table.insert(WORLD_OBJECTS, createBadGuy(880,362,PatrolLeftRight))
-
-	table.insert(WORLD_OBJECTS, createBadGuy(1065,561,PatrolUpDown))
-
-	table.insert(WORLD_OBJECTS, createBadGuy(967,1123,PatrolSquare))
-
-	table.insert(WORLD_OBJECTS, player)
 	--table.insert(WORLD_OBJECTS, createMoleFact(400,200, MOLE_FACT))
 	
 end
@@ -146,11 +139,42 @@ function createMoleFact(x, y, info)
 end
  
 function createPlayer(x, y)
-	return GameObject(x, y, 16, 16, 6, PlayerInputComponent, PlayerPhysicsComponent)
+	return GameObject(x, y, 16, 16, 3, PlayerInputComponent, PlayerPhysicsComponent)
 end
 
 function createBadGuy(x,y,input)
-	return Enemy(x,y,16,16,3,input,EnemyPhysicsComponent,3)
+	return Enemy(x,y,16,16,2,input,EnemyPhysicsComponent,3)
+end
+
+function resetGame()
+	GAME_OVER = false
+	gameOverFade = 0
+
+	WORLD_OBJECTS = {}
+
+	player = createPlayer(1030,1480)
+	player:setCodec(codec)
+
+	
+
+
+	table.insert(WORLD_OBJECTS, player)
+	
+	table.insert(WORLD_OBJECTS, createBadGuy(280,1490,PatrolLeftRight))
+	table.insert(WORLD_OBJECTS, createBadGuy(880,362,PatrolLeftRight))
+
+	table.insert(WORLD_OBJECTS, createBadGuy(1065,561,PatrolUpDown))
+	table.insert(WORLD_OBJECTS, createBadGuy(967,633,PatrolUpDown))
+	table.insert(WORLD_OBJECTS, createBadGuy(1423,800,PatrolUpDown))
+	table.insert(WORLD_OBJECTS, createBadGuy(1165,1165,PatrolUpDown))
+	table.insert(WORLD_OBJECTS, createBadGuy(647,137,PatrolUpDown))
+	table.insert(WORLD_OBJECTS, createBadGuy(1483,1087,PatrolUpDown))
+
+	table.insert(WORLD_OBJECTS, createBadGuy(900,933,PatrolSquare))
+	table.insert(WORLD_OBJECTS, createBadGuy(100,933,PatrolSquare))
+	table.insert(WORLD_OBJECTS, createBadGuy(423,263,PatrolSquare))
+
+
 end
 
 -------------
@@ -158,7 +182,6 @@ end
 -------------
 
 function love.keypressed(key, isrepeat)
-	
 	if key == " " and table.getn(codec.textToRead) > 0 and codec.active and not codec.isRinging then
 		codec:nextLine()
 		blip:play()
@@ -181,6 +204,10 @@ function love.keypressed(key, isrepeat)
 		codec:activate()
 	end
 
+	if key == " " and GAME_OVER then
+		resetGame()
+	end
+
 end
 
 time = 0
@@ -195,7 +222,7 @@ function love.update(dt)
 		codecRing:play()
 	end
 
-	if not codec.active and not PLAY_INTRO_CODEC then
+	if not codec.active and not PLAY_INTRO_CODEC and not GAME_OVER then
 		numObjects = table.getn(WORLD_OBJECTS)
 
 		for i = 1, numObjects do
@@ -217,7 +244,7 @@ playerCamera = Camera(0,0,1,1,0)
 playerCamera:setBounds(0,0,(table.getn(int_map[1])*TILE_WIDTH-SCREEN_WIDTH/2),table.getn(int_map)*TILE_WIDTH-SCREEN_HEIGHT/2)
 
 guiCamera = Camera(0,0,1,1,0)
-SCALE = 2
+SCALE =.5
 
 codecRingImage = love.graphics.newImage("getCall.png")
 codecRingScale = 1
@@ -229,11 +256,14 @@ titleTwoFade = 1
 
 fadingIn = true
 
+gameOverScreen = love.graphics.newImage("gameOver.png")
+gameOverFade = 0
+
 function love.draw()
 	love.graphics.setColor(255,255,255,255)
 
 	playerCamera:set()
-	--playerCamera:setPosition((player.x+player.width/2)-SCREEN_WIDTH/4 , (player.y+player.height/2)-SCREEN_HEIGHT/4)
+	playerCamera:setPosition((player.x+player.width/2)-SCREEN_WIDTH/4 , (player.y+player.height/2)-SCREEN_HEIGHT/4)
 	playerCamera:setScale(SCALE,SCALE)
 
 	
@@ -241,6 +271,8 @@ function love.draw()
 		drawMap()
 		drawObjects()
 	end
+
+	
 	
 
 	--GUI
@@ -261,11 +293,19 @@ function love.draw()
 		handleCodec()
 	end
 
-	love.graphics.print(player.x..","..player.y,0,0)
 
 	if codec.isRinging then
 		love.graphics.setColor(255,255,255, createSineWave(50,255,4,time) )
 		love.graphics.draw(codecRingImage, (SCREEN_WIDTH/2)-codecRingImage:getWidth()*codecRingScale/2, (SCREEN_HEIGHT/2)-codecRingImage:getHeight()*codecRingScale/2,0,codecRingScale,codecRingScale)
+	end
+
+	if GAME_OVER then
+		love.graphics.setColor(225,255,255,gameOverFade)
+
+		love.graphics.draw(gameOverScreen)
+		if fadeIn(gameOverFade) then
+			gameOverFade = gameOverFade + .6
+		end
 	end
 	guiCamera:unset()
 	
@@ -329,7 +369,7 @@ end
 
 
 function playIntroConversation()
-	codec:setText(MOLE_CONVERSATION)
+	codec:setText(INTRO_CODEC)
 	codec.isRinging = true
 end
 
@@ -356,16 +396,30 @@ function drawMap()
 	end
 end
 
+spottedImage = love.graphics.newImage("!.png")
+cone = love.graphics.newImage("vision.png")
+lel = 0
 function drawObjects()
 	for i = 1, table.getn(WORLD_OBJECTS) do
 		love.graphics.setColor(0,255,0,255)
 		local object = WORLD_OBJECTS[i]
 
 		if instanceOf(object, Enemy) then
+			
+			love.graphics.setColor(255,255,255,255)
+			if object.spottedPlayer then
+				spotScale = .05
+				love.graphics.draw(spottedImage, object.x+object.width/2-(spottedImage:getWidth()*spotScale)/2,object.y+object.height/2-(spottedImage:getHeight()*spotScale)/2-30,0,spotScale,spotScale)
+			end
+
+			love.graphics.setColor(255,255,255,115)
+			love.graphics.draw(cone, (object.x+(object.width/2)), (object.y+(object.height/2)),math.rad(object.angle-90),1,1,cone:getWidth()/2,cone:getHeight())
 			love.graphics.setColor(255,0,0,225)
 
 			for i = 1, table.getn(object.viewTiles) do
-				love.graphics.circle("fill", object.viewTiles[i].x+(TILE_WIDTH/2), object.viewTiles[i].y+(TILE_WIDTH/2), 10, 200)
+				--love.graphics.circle("fill", object.viewTiles[i].x+(TILE_WIDTH/2), object.viewTiles[i].y+(TILE_WIDTH/2), 10, 200)
+
+				
 			end
 		elseif instanceOf(object, Collectible) then
 			love.graphics.setColor(0,0,255,225)

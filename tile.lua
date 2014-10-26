@@ -22,13 +22,13 @@ Tile = class(function(t)
 function Tile:new(id)
 
 
-	if id == 0 then
-		self.image = grass
-		self.collide = false
-	elseif id == 1 then
+	if id == 1 then
 		self.image = stone
 		self.collide = true
 	elseif id == 2 then
+		self.image = grass
+		self.collide = false
+	elseif id == 3 then
 		self.image = dirt
 		self.collide = false
 	end

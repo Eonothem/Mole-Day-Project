@@ -7,24 +7,55 @@ require("audio")
 SCALE_FACTOR = 1
 TILE_WIDTH = 32*SCALE_FACTOR
 
+CURRENT_SONG = discovery
 
 
-int_map = {{1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 }, 
-	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,0 ,0 ,0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 },
-	       {1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1}}
+
+int_map = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,1,1,2,2,2,2,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1,1,1},
+{1,1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,1,1,1},
+{1,1,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,1,1,1},
+{1,1,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1},
+{1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}}
+
 
 MOLE_FACT = "A mole is a unit of measurment that is pretty swag."
 
-MOLE_CONVERSATION = {"Solid Mole, can you read me?", "Loud and clear Colonel Avagrado.", "Okay. As you know, Liquid Mole has been gathering various chemistry facts in order to work on his new war machine.", "Yeah, Metal Gear MOL.",
+MOLE_CONVERSATION = {"Solid Mole, can you read me?", "Loud and clear Colonel Avagrado.", "As you know, Liquid Mole has been gathering various chemistry facts in order to work on his new war machine.", "Yeah, Metal Gear MOL.",
 "Your mission is to infeltrate Liquid Mole's base and to retrive these chemistry facts so that Liquid Mole cannot finish his plans.", "Lethal or non-lethal?", "Non-lethal, we don't want any bodies laying around.", "Alright, so just retrive the mole facts and get out of there?",
 "Yes. Make sure you are not seen by any of the guards, or it's game over.","The gaurd's line of sight should be visible due to your implanted nanomachines.","If you need more information, contact me on your Moldec.","My frequency is 6.0221","Got it.", "Good luck."}
 
@@ -38,15 +69,24 @@ WORLD_OBJECTS = {}
 
 FONT_SIZE =48
 
+PLAY_INTRO = false
+PLAY_INTRO_CODEC = false
+
 ------------------
 --PRE GAME STUFF--
 ------------------
 
 function love.load()
+	if PLAY_INTRO then
+		CURRENT_SONG = discovery
+	else
+		CURRENT_SONG = cavern
+	end
+
+	CURRENT_SONG:play()
 	------------
 	--Set Font--
 	------------
-	theme:play()
 	love.window.setMode(SCREEN_WIDTH,SCREEN_HEIGHT)
 
 	love.graphics.setNewFont("novem.ttf", FONT_SIZE)
@@ -73,13 +113,15 @@ function love.load()
 	codec = Codec()
 	dialogHandler = TextBox()
 
-	player = createPlayer(77,77)
+	player = createPlayer(480,160)
 	player.isSpotted = false
 	player:setCodec(codec)
 
-	table.insert(WORLD_OBJECTS, createBadGuy(100,100))
+	
+
+	table.insert(WORLD_OBJECTS, createBadGuy(706,1029))
 	table.insert(WORLD_OBJECTS, player)
-	table.insert(WORLD_OBJECTS, createMoleFact(400,200, MOLE_FACT))
+	--table.insert(WORLD_OBJECTS, createMoleFact(400,200, MOLE_FACT))
 	
 end
 
@@ -88,7 +130,7 @@ function createMoleFact(x, y, info)
 end
  
 function createPlayer(x, y)
-	return GameObject(x, y, 16, 16, 4, PlayerInputComponent, PlayerPhysicsComponent)
+	return GameObject(x, y, 16, 16, 2, PlayerInputComponent, PlayerPhysicsComponent)
 end
 
 function createBadGuy(x,y)
@@ -107,6 +149,13 @@ function love.keypressed(key, isrepeat)
 
 		if table.getn(codec.textToRead) == 0 then
 			codec:deactivate()
+
+			if PLAY_INTRO_CODEC then
+				CURRENT_SONG:stop()
+				CURRENT_SONG = cavern
+				CURRENT_SONG:play()
+				PLAY_INTRO_CODEC = false
+			end
 		end
 	end
 
@@ -119,6 +168,7 @@ function love.keypressed(key, isrepeat)
 end
 
 time = 0
+
 function love.update(dt)
 	time = time+dt
 	------------------
@@ -129,7 +179,7 @@ function love.update(dt)
 		codecRing:play()
 	end
 
-	if not codec.active then
+	if not codec.active and not PLAY_INTRO_CODEC then
 		numObjects = table.getn(WORLD_OBJECTS)
 
 		for i = 1, numObjects do
@@ -148,21 +198,149 @@ end
 -----
 
 playerCamera = Camera(0,0,1,1,0)
+playerCamera:setBounds(0,0,(table.getn(int_map[1])*TILE_WIDTH-SCREEN_WIDTH/2),table.getn(int_map)*TILE_WIDTH-SCREEN_HEIGHT/2)
+
 guiCamera = Camera(0,0,1,1,0)
 SCALE = .5
 
 codecRingImage = love.graphics.newImage("getCall.png")
+codecRingScale = 1
+
+titleOne = love.graphics.newImage("title1.png")
+titleTwo = love.graphics.newImage("title2.png")
+titleOneFade = 0
+titleTwoFade = 1
+
+fadingIn = true
 
 function love.draw()
+	love.graphics.setColor(255,255,255,255)
+
 	playerCamera:set()
+	playerCamera:setPosition((player.x+player.width/2)-SCREEN_WIDTH/4 , (player.y+player.height/2)-SCREEN_HEIGHT/4)
 	playerCamera:setScale(SCALE,SCALE)
+
 	
+	if not PLAY_INTRO_CODEC and not PLAY_INTRO then
+		drawMap()
+		drawObjects()
+	end
+	
+
+	--GUI
+	playerCamera:unset()
+
+	guiCamera:set()
+
+	if PLAY_INTRO then
+		handleIntro()	
+	end
+
+	if codecTimer:getElpasedTime() > 1 then
+		playIntroConversation()
+		codecTimer:clear()
+	end
+
+	if codec.active then
+		handleCodec()
+	end
+
+	love.graphics.print(player.x..","..player.y,0,0)
+
+	if codec.isRinging then
+		love.graphics.setColor(255,255,255, createSineWave(50,255,4,time) )
+		love.graphics.draw(codecRingImage, (SCREEN_WIDTH/2)-codecRingImage:getWidth()*codecRingScale/2, (SCREEN_HEIGHT/2)-codecRingImage:getHeight()*codecRingScale/2,0,codecRingScale,codecRingScale)
+	end
+	guiCamera:unset()
+	
+end
+
+fadeTime = 1
+
+codecTimer = Timer()
+
+function handleIntro()
+	if fadingIn then
+		love.graphics.setColor(255,255,255,255)
+	else
+		love.graphics.setColor(255,255,255,0)
+	end
+
+	love.graphics.rectangle("fill",0,0,SCREEN_WIDTH,SCREEN_HEIGHT)
+		
+	if fadingIn then
+		love.graphics.setColor(255,255,255,titleOneFade)
+		
+		love.graphics.draw(titleOne)
+
+		if fadeIn(titleOneFade) then 
+			titleOneFade = titleOneFade + fadeTime
+		end
+	end
+
+	-------------------------------------
+
+	love.graphics.setColor(255,255,255,titleTwoFade)
+
+	if fadingIn then
+		if not fadeIn(titleOneFade) then
+				
+			if fadeIn(titleTwoFade) then 
+				titleTwoFade = titleTwoFade + fadeTime
+			else
+				fadingIn = false
+			end
+		end
+	else
+
+		if fadeOut(titleTwoFade) then
+			titleTwoFade = titleTwoFade - fadeTime
+		end
+	end
+
+	love.graphics.draw(titleTwo)
+
+	if not fadeOut(titleTwoFade) then
+		PLAY_INTRO = false
+		PLAY_INTRO_CODEC = true
+		codecTimer:start()
+	end
+
+	
+end
+
+
+
+
+function playIntroConversation()
+	codec:setText(MOLE_CONVERSATION)
+	codec.isRinging = true
+end
+
+function fadeIn(fadeValue)
+	return fadeValue < 255
+end
+
+function fadeOut(fadeValue)
+	return fadeValue > 0
+end
+
+--------------------
+
+function createSineWave(min, max, freq, time)
+	return ((max-min)/2)*math.sin(time*freq)+(((min+max)/2))
+end
+
+
+function drawMap()
 	for row = 1, table.getn(map) do
 		for col = 1, table.getn(map[row]) do
 			love.graphics.draw(tilemap, map[row][col].image, map[row][col].col*TILE_WIDTH-TILE_WIDTH, map[row][col].row*TILE_WIDTH-TILE_WIDTH, 0)
 		end
 	end
+end
 
+function drawObjects()
 	for i = 1, table.getn(WORLD_OBJECTS) do
 		love.graphics.setColor(0,255,0,255)
 		local object = WORLD_OBJECTS[i]
@@ -181,23 +359,6 @@ function love.draw()
 
 
 	end
-
-	playerCamera:unset()
-	--handleTextBox()
-	guiCamera:set()
-
-	if codec.active then
-		handleCodec()
-	end
-
-	love.graphics.setColor(255,255,255,255)
-
-	if codec.isRinging then
-		love.graphics.draw(codecRingImage, (SCREEN_WIDTH/2)-codecRingImage:getWidth()/2, (SCREEN_HEIGHT/6)-codecRingImage:getHeight()/2,0,.8,.8)
-	end
-
-	guiCamera:unset()
-	
 end
 
 love.graphics.setColor(11,38,33,255)

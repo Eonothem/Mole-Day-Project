@@ -61,17 +61,27 @@ function Enemy:getVision(map)
 	self.viewTiles = {}
 	if self.angle == 0 then
 		
-		for i = 1, self.viewRange do
-			if map[toGrid(self.y)][toGrid(self.x)+i].collide then break end
-			table.insert(self.viewTiles, map[toGrid(self.y)][toGrid(self.x)+i])
+		for j = -1, 1 do
+			for i = 1, self.viewRange do
+				if map[toGrid(self.y)+j][toGrid(self.x)+i].collide then break end
+
+				if not (j == -1 and i == 1) and not (j == 1 and i == 1) then
+					table.insert(self.viewTiles, map[toGrid(self.y)+j][toGrid(self.x)+i])
+				end
+			end
 		end
 
 	elseif self.angle == 180 then
 
+	for j = -1, 1 do
 		for i = 1, self.viewRange do
-			if map[toGrid(self.y)][toGrid(self.x)-i].collide then break end
-			table.insert(self.viewTiles, map[toGrid(self.y)][toGrid(self.x)-i])
+			if map[toGrid(self.y)+j][toGrid(self.x)-i].collide then break end
+
+			if not (j == -1 and i == 1) and not (j == 1 and i == 1) then
+				table.insert(self.viewTiles, map[toGrid(self.y)+j][toGrid(self.x)-i])
+			end
 		end
+	end
 
 	end
 end
@@ -316,13 +326,13 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
     			if compareObject.viewTiles[j] == object.currentTile then
     				if not object.isSpotted then
     					alert:play()
-    					theme:pause()
     					alertTimer = Timer()
     					alertTimer:start()
     				end
 
     				--Wait
     				if object.isSpotted and alertTimer:getElpasedTime() > .5 then
+    					CURRENT_SONG:stop()
     					gameOver:play()
     					alertTimer:clear()
     				end
@@ -428,7 +438,7 @@ function handleVerticalCollision(object, map)
 	end
 end
 
-TOLERANCE = 2
+TOLERANCE = 1
 function getVerticalIntersectionDepth(rectA, rectB)
 
 	local rectAHalfHeight = rectA.height/2

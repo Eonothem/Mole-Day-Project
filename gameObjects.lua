@@ -58,6 +58,7 @@ function Enemy:update(dt, map, world)
 end
 
 function Enemy:getVision(map)
+
 	self.viewTiles = {}
 	if self.angle == 0 then
 		
@@ -82,6 +83,31 @@ function Enemy:getVision(map)
 			end
 		end
 	end
+
+	elseif self.angle == 270 then
+
+		for j = -1, 1 do
+			for i = 1, self.viewRange do
+				if map[toGrid(self.y)+i][toGrid(self.x)+j].collide then break end
+
+				if not (j == -1 and i == 1) and not (j == 1 and i == 1) then
+					table.insert(self.viewTiles, map[toGrid(self.y)+i][toGrid(self.x)+j])
+				end
+			end
+		end
+
+
+	elseif self.angle == 90 then
+
+		for j = -1, 1 do
+			for i = 1, self.viewRange do
+				if map[toGrid(self.y)-i][toGrid(self.x)+j].collide then break end
+
+				if not (j == -1 and i == 1) and not (j == 1 and i == 1) then
+					table.insert(self.viewTiles, map[toGrid(self.y)-i][toGrid(self.x)+j])
+				end
+			end
+		end
 
 	end
 end
@@ -143,7 +169,7 @@ function PatrolSquare:update(object,map)
 
 	if not object.spottedPlayer then
 		if isStill(object) then
-			walkUp(object)
+			walkRight(object)
 		else
 			if walkingUp(object) and map[toGrid(centerY)-1][toGrid(centerX)].collide then
 				walkRight(object)

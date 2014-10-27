@@ -2,7 +2,7 @@ require("class")
 TILE_WIDTH = 32
 TILE_REAL_WIDTH = 34
 
-tilemap = love.graphics.newImage("tileCor.png")
+tilemap = love.graphics.newImage("tileFinal.png")
 
 
 function colToX(col)
@@ -16,6 +16,7 @@ end
 stone = love.graphics.newQuad(colToX(0),0,TILE_WIDTH, TILE_WIDTH, tilemap:getDimensions())
 grass = love.graphics.newQuad(colToX(1),0,TILE_WIDTH, TILE_WIDTH, tilemap:getDimensions())
 dirt = love.graphics.newQuad(colToX(2),0,TILE_WIDTH,TILE_WIDTH, tilemap:getDimensions())
+snow = love.graphics.newQuad(colToX(3),0,TILE_WIDTH,TILE_WIDTH, tilemap:getDimensions())
 
 topLeftFloor = love.graphics.newQuad(colToX(0),rowToY(1),TILE_WIDTH, TILE_WIDTH, tilemap:getDimensions())
 topCenterFloor = love.graphics.newQuad(colToX(1),rowToY(1),TILE_WIDTH, TILE_WIDTH, tilemap:getDimensions())
@@ -89,6 +90,9 @@ function Tile:new(id)
 		self.collide = false
 	elseif id == 24 then
 		self.image = floorCornerBotLeft
+		self.collide = false
+	elseif id == 29 then
+		self.image = snow
 		self.collide = false
 	end
 	

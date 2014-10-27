@@ -52,7 +52,7 @@ PhysicsComponent = class()
 
 function Enemy:update(dt, map, world)
 	self.input:update(self,map)
-	self.physics:update(self,map)
+	self.physics:update(self,map,dt)
 	self:getVision(map)
 
 end
@@ -118,12 +118,12 @@ end
 
 EnemyPhysicsComponent = class(PhysicsComponent)
 
-function EnemyPhysicsComponent:update(object, map)
+function EnemyPhysicsComponent:update(object, map,dt)
 	local centerX = object.x + (object.width/2)
 	local centerY = object.y + (object.height/2)
 
-	object.y = object.y + (object.speed*object.velocityY)
-	object.x = object.x + (object.speed*object.velocityX)
+	object.y = object.y + (object.speed*object.velocityY)*dt
+	object.x = object.x + (object.speed*object.velocityX)*dt
 
 		
 end
@@ -268,7 +268,7 @@ end
 
 function GameObject:update(dt, map, world)
 	self.input:update(self)
-	self.physics:update(self, self.speed, map, world)
+	self.physics:update(self, self.speed, map, world,dt)
 end
 
 function GameObject:setCodec(codec)
@@ -318,7 +318,7 @@ function Timer:clear()
 	self.startTime = -1
 end
 
-function PlayerPhysicsComponent:update(object, speed, map, world)
+function PlayerPhysicsComponent:update(object, speed, map, world,dt)
 	object.currentTile = map[toGrid(object.y+(object.height/2))][toGrid(object.x+(object.width/2))]
 
 	----------------------
@@ -327,13 +327,13 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
 
 	if not object.isSpotted then
 		if object.velocityY ~= 0 then
-        	object.y = object.y+(speed*object.velocityY)
+        	object.y = object.y+(speed*object.velocityY)*dt
         	handleVerticalCollision(object, map)
 
    	 	end
 
 		if object.velocityX ~= 0 then
-        	object.x = object.x+(speed*object.velocityX)
+        	object.x = object.x+(speed*object.velocityX)*dt
         	handleHorizontalCollision(object, map)
     	end
     end
@@ -375,9 +375,12 @@ function PlayerPhysicsComponent:update(object, speed, map, world)
     		-- Player -> Collectible
     		if instanceOf(collidedObject, Collectible) then
     			pickup:play()
-    			object.codec:setText(MOLE_CONVERSATION)
-    			codec.isRinging = true
     			collidedObject.isDead = true
+    			if table.getn(collidedObject.info) ~= 0 then
+    				object.codec:setText(collidedObject.info)
+    				codec.isRinging = true
+    				COLLECTED_MOLE_FACTS = COLLECTED_MOLE_FACTS+1
+    			end
     		end
 
     	end
@@ -464,7 +467,7 @@ function handleVerticalCollision(object, map)
 	end
 end
 
-TOLERANCE = 1
+TOLERANCE =.2
 function getVerticalIntersectionDepth(rectA, rectB)
 
 	local rectAHalfHeight = rectA.height/2
